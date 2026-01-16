@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - My Blog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="mb-4">About My Blog</h1>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Welcome to Our Blog</h3>
+                    <p class="card-text">
+                        This is a Django-powered blog created to share knowledge, ideas, 
+                        and experiences with the world. Our mission is to provide a 
+                        platform for writers and readers to connect and share meaningful 
+                        content.
+                    </p>
+                    <p>
+                        Whether you're here to read interesting articles or share your 
+                        own thoughts, we're glad to have you as part of our community.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5><i class="fas fa-rocket text-primary me-2"></i>Our Mission</h5>
+                            <p>To create a platform where everyone can express themselves freely through writing.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5><i class="fas fa-users text-success me-2"></i>Our Community</h5>
+                            <p>Join thousands of writers and readers sharing knowledge every day.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Stats</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-file-alt text-primary me-2"></i>
+                            Total Posts: <strong>{{ total_posts|default:"0" }}</strong>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-users text-success me-2"></i>
+                            Total Users: <strong>{{ total_users|default:"0" }}</strong>
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-comments text-warning me-2"></i>
+                            Total Comments: <strong>{{ total_comments|default:"0" }}</strong>
+                        </li>
+                        <li>
+                            <i class="fas fa-folder text-info me-2"></i>
+                            Categories: <strong>{{ total_categories|default:"0" }}</strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h5>Want to contribute?</h5>
+                    <p>Join our community of writers!</p>
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'register' %}" class="btn btn-primary">Sign Up Now</a>
+                    {% else %}
+                    <a href="{% url 'post_create' %}" class="btn btn-success">Write a Post</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

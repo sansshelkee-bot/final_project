@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found - 404{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-content">
+        <h1>404</h1>
+        <h2>Page Not Found</h2>
+        <p>Sorry, the page you're looking for doesn't exist or has been moved.</p>
+        <div class="error-actions">
+            <a href="{% url 'home' %}" class="btn btn-primary">Go to Homepage</a>
+            <a href="{% url 'post_list' %}" class="btn btn-secondary">Browse Posts</a>
+        </div>
+        <div class="error-search mt-4">
+            <p>Or try searching for what you need:</p>
+            <form action="{% url 'post_list' %}" method="GET" class="search-form-inline">
+                <input type="text" name="q" placeholder="Search posts...">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    text-align: center;
+    padding: 2rem;
+}
+
+.error-content h1 {
+    font-size: 8rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 0;
+    line-height: 1;
+}
+
+.error-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.error-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.search-form-inline {
+    display: flex;
+    max-width: 400px;
+    margin: 1rem auto;
+}
+
+.search-form-inline input {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px 0 0 4px;
+}
+
+.search-form-inline button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+}
+</style>
+{% endblock %}

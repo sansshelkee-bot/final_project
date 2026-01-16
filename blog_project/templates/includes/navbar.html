@@ -1,0 +1,134 @@
+<!-- In your navbar/templates/base.html -->
+{% if user.is_authenticated %}
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+       data-bs-toggle="dropdown">
+        <i class="fas fa-user me-1"></i> {{ user.username }}
+    </a>
+    <ul class="dropdown-menu">
+        <li>
+            <!-- CHECK THIS LINE - Should be 'profile_view' -->
+            <a class="dropdown-item" href="{% url 'profile_view' %}">
+                <i class="fas fa-user-circle me-2"></i> My Profile
+            </a>
+        </li>
+        <!-- ... other dropdown items ... -->
+    </ul>
+</li>
+{% endif %}
+<nav class="navbar">
+    <div class="nav-container">
+        <!-- Logo -->
+        <div class="logo">
+            <a href="{% url 'home' %}">
+                <h1>BlogSite</h1>
+            </a>
+        </div>
+        <!-- In your navbar, update the profile link to use 'profile_view' -->
+
+
+        <!-- Desktop Menu -->
+        <ul class="nav-menu">
+            <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+            <li><a href="{% url 'post_list' %}" class="nav-link">Blog</a></li>
+            <li class="dropdown">
+                <a href="#" class="nav-link">Categories ▾</a>
+                <div class="dropdown-content">
+                    <!-- Will be populated dynamically -->
+                    <a href="#">Technology</a>
+                    <a href="#">Lifestyle</a>
+                    <a href="#">Travel</a>
+                </div>
+            </li>
+            <li><a href="#" class="nav-link">About</a></li>
+            <li><a href="#" class="nav-link">Contact</a></li>
+            
+            <!-- Search -->
+            <li class="search-container">
+                <form class="search-form" method="GET" action="{% url 'post_list' %}">
+                    <input type="text" name="q" placeholder="Search posts..." class="search-input">
+                    <button type="submit" class="search-btn">🔍</button>
+                </form>
+            </li>
+        </ul>
+
+        <!-- Auth Links -->
+        <div class="auth-links">
+            {% if user.is_authenticated %}
+                <div class="user-dropdown">
+                    <a href="#" class="user-profile">
+                        <span>👤 {{ user.username }}</span> ▾
+                    </a>
+                    <div class="user-dropdown-content">
+                        <a href="{% url 'profile' %}">Profile</a>
+                        <a href="{% url 'create_post' %}">New Post</a>
+                        <a href="{% url 'my_posts' %}">My Posts</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'logout' %}">Logout</a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-login">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-register">Register</a>
+            {% endif %}
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <ul>
+            <li><a href="{% url 'home' %}">Home</a></li>
+            <li><a href="{% url 'post_list' %}">Blog</a></li>
+            <li><a href="#">Categories</a></li>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Contact</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'profile' %}">Profile</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
+        </ul>
+    </div>
+    <!-- Add this to your navbar -->
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Categories
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        {% for category in categories %}
+        <li>
+            <a class="dropdown-item" href="{{ category.get_absolute_url }}">
+                {{ category.name }}
+            </a>
+        </li>
+        {% empty %}
+        <li><a class="dropdown-item" href="#">No categories yet</a></li>
+        {% endfor %}
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <a class="dropdown-item" href="{% url 'all_categories' %}">
+                View All Categories
+            </a>
+        </li>
+    </ul>
+    {% if user.is_authenticated %}
+    <!-- Logout Form -->
+    <form method="post" action="{% url 'logout' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-link nav-link" style="border: none; background: none;">
+            <i class="fas fa-sign-out-alt me-1"></i> Logout
+        </button>
+    </form>
+{% endif %}
+</li>
+</nav>

@@ -1,0 +1,48 @@
+<footer class="main-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>BlogSite</h3>
+            <p>A platform for sharing knowledge and ideas.</p>
+            <div class="social-links">
+                <a href="#"><i>🐦</i></a>
+                <a href="#"><i>📘</i></a>
+                <a href="#"><i>📷</i></a>
+                <a href="#"><i>📺</i></a>
+            </div>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'post_list' %}">Blog</a></li>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Contact</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Categories</h4>
+            <ul>
+                <li><a href="#">Technology</a></li>
+                <li><a href="#">Lifestyle</a></li>
+                <li><a href="#">Travel</a></li>
+                <li><a href="#">Food</a></li>
+            </ul>
+        </div>
+        
+        <div class="footer-section">
+            <h4>Newsletter</h4>
+            <p>Subscribe to get updates on new posts.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Your email" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; {% now "Y" %} BlogSite. All rights reserved.</p>
+        <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+    </div>
+</footer>

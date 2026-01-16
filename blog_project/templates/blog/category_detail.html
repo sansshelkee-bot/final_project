@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ category.name }}</h1>
+    <p>{{ category.description|default:"" }}</p>
+    
+    {% for post in posts %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5>{{ post.title }}</h5>
+            <p>{{ post.excerpt|truncatewords:30 }}</p>
+            <a href="{% url 'post_detail' post.slug %}">Read More</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>No posts in this category.</p>
+    {% endfor %}
+</div>
+{% endblock %}

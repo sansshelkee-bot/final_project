@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - BlogSite{% endblock %}
+
+{% block extra_css %}
+<style>
+    .post-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: rgb(12, 12, 12);
+        padding: 4rem 0;
+        margin-bottom: 2rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Post Header -->
+<header class="post-header">
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="{% url 'home' %}">Home</a> / 
+            <a href="{% url 'post_list' %}">Blog</a> / 
+            <span>{{ post.title }}</span>
+        </div>
+        <h1>{{ post.title }}</h1>
+        <div class="post-meta-large">
+            <div class="author-info">
+                <span>By {{ post.author.username }}</span>
+            </div>
+            <div class="meta-details">
+                <span><i>📅</i> {{ post.publish_date|date:"F d, Y" }}</span>
+                <span><i>⏱️</i> {{ post.read_time }} min read</span>
+                <span><i>👁️</i> {{ post.views }} views</span>
+            </div>
+            <div class="post-tags">
+                {% for tag in post.tags.all %}
+                <a href="#" class="tag">{{ tag.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!-- Near the post title or meta info -->
+{% if post.category %}
+<span class="post-category">
+    <a href="{{ post.category.get_absolute_url }}" class="badge bg-primary text-decoration-none">
+        {{ post.category.name }}
+    </a>
+</span>
+{% endif %}
+
+<!-- Post Content -->
+<article class="post-content-full container">
+    {% if post.image %}
+    <div class="featured-image">
+        <img src="{{ post.image.url }}" alt="{{ post.title }}">
+    </div>
+    {% endif %}
+    
+    <div class="post-body">
+        {{ post.content|safe }}
+    </div>
+    
+    <!-- Post Actions -->
+   <div class="post-actions">
+    <!-- Like Button (Form submission) -->
+    <form method="post" action="{% url 'like_post' post.slug %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn-like">
+            {% if user.is_authenticated and user in post.likes.all %}
+                ❤️ Unlike ({{ post.likes.count }})
+            {% else %}
+                🤍 Like ({{ post.likes.count }})
+            {% endif %}
+        </button>
+    </form>
+    
+    <!-- Share Button -->
+    <button class="btn-share" onclick="sharePost('{{ post.title|escapejs }}')">
+        📤 Share
+    </button>
+    
+    <!-- Edit/Delete buttons (if you have them) -->
+    {% if user == post.author or user.is_superuser %}
+    <a href="{% url 'post_update' post.slug %}" class="btn-edit">✏️ Edit</a>
+    <a href="{% url 'post_delete' post.slug %}" class="btn-delete">🗑️ Delete</a>
+    {% endif %}
+</div>
+
+<!-- Add this script at the BOTTOM of post_detail.html, before closing body tag -->
+<script>
+function sharePost(postTitle) {
+    const url = window.location.href;
+    const title = postTitle || document.title;
+    
+    // Try Web Share API (modern browsers/mobile)
+    if (navigator.share) {
+        navigator.share({
+            title: title,
+            text: 'Check out this post: ' + title,
+            url: url
+        })
+        .then(() => console.log('Successfully shared'))
+        .catch(error => console.log('Error sharing:', error));
+    } else {
+        // Fallback 1: Copy to clipboard
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    alert('Link copied to clipboard!');
+                })
+                .catch(err => {
+                    // Fallback 2: Twitter share
+                    window.open(
+                        'https://twitter.com/intent/tweet?text=' + 
+                        encodeURIComponent('Check out: ' + title) + 
+                        '&url=' + encodeURIComponent(url),
+                        '_blank',
+                        'width=600,height=400'
+                    );
+                });
+        } else {
+            // Fallback 3: Twitter share (old browsers)
+            window.open(
+                'https://twitter.com/intent/tweet?text=' + 
+                encodeURIComponent('Check out: ' + title) + 
+                '&url=' + encodeURIComponent(url),
+                '_blank',
+                'width=600,height=400'
+            );
+        }
+    }
+}
+</script>
+
+<!-- Comments Section -->
+<section class="comments-section container">
+    <h2>Comments ({{ post.comments.count }})</h2>
+    
+    <!-- Comment Form -->
+    {% if user.is_authenticated %}
+    <form class="comment-form" method="POST" action="{% url 'add_comment' post.slug %}">
+        {% csrf_token %}
+        <textarea name="content" placeholder="Write your comment..." required></textarea>
+        <input type="hidden" name="parent_id" id="parent_id">
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+    </form>
+    {% else %}
+    <p class="login-prompt">
+        <a href="{% url 'login' %}">Login</a> to post a comment.
+    </p>
+    {% endif %}
+    
+    <!-- Comments List -->
+    <div class="comments-list">
+        {% for comment in comments %}
+        <div class="comment" id="comment-{{ comment.id }}">
+            <div class="comment-header">
+                <strong>{{ comment.author.username }}</strong>
+                <span class="comment-date">{{ comment.created_date|timesince }} ago</span>
+            </div>
+            <div class="comment-body">
+                {{ comment.content|linebreaks }}
+            </div>
+            <div class="comment-actions">
+                <button class="btn-reply" data-comment-id="{{ comment.id }}">Reply</button>
+                {% if user == comment.author or user.is_superuser %}
+                <a href="{% url 'edit_comment' comment.id %}" class="btn-edit-comment">Edit</a>
+                <a href="{% url 'delete_comment' comment.id %}" class="btn-delete-comment">Delete</a>
+                {% endif %}
+            </div>
+            
+            <!-- Replies -->
+            {% for reply in comment.replies.all %}
+            <div class="comment reply">
+                <div class="comment-header">
+                    <strong>{{ reply.author.username }}</strong>
+                    <span class="comment-date">{{ reply.created_date|timesince }} ago</span>
+                </div>
+                <div class="comment-body">
+                    {{ reply.content|linebreaks }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% empty %}
+        <p class="no-comments">No comments yet. Be the first to comment!</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Related Posts -->
+<section class="related-posts container">
+    <h2>Related Posts</h2>
+    <div class="posts-grid">
+        {% for related_post in related_posts %}
+        <article class="post-card-small">
+            <h3><a href="{% url 'post_detail' related_post.slug %}">{{ related_post.title }}</a></h3>
+            <p>{{ related_post.excerpt|truncatewords:20 }}</p>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Like functionality
+    document.querySelectorAll('.btn-like').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.dataset.postId;
+            // AJAX call to like/unlike
+            console.log('Liking post:', postId);
+        });
+    });
+    
+    // Reply to comments
+    document.querySelectorAll('.btn-reply').forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.dataset.commentId;
+            document.getElementById('parent_id').value = commentId;
+            document.querySelector('.comment-form textarea').focus();
+            document.querySelector('.comment-form textarea').placeholder = 'Replying to comment...';
+        });
+    });
+</script>
+{% endblock %}
